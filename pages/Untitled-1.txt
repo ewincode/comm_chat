@@ -1,0 +1,28 @@
+		
+        
+      SELECT t2.userID
+      	    ,t1.user_id as sID
+            ,CONCAT(fname, ' ', lname) AS FullName
+            ,(CASE
+              	  WHEN t1.mode=0 THEN 'Commented'
+              	  WHEN t1.mode=1 THEN 'Liked'
+              	  ELSE ''
+              END)
+            ,t1.created_date
+      FROM(
+        	SELECT (CASE 
+                        WHEN t1.mode=0 THEN t2.post_id 
+                    	WHEN t1.mode=1 THEN t3.topic_id
+                    	ELSE 0
+                    END)as PostID
+                    ,t1.user_id
+                    ,t1.created_date
+                    ,t1.mode
+          		    ,t1.status
+            FROM notifi_tbl t1
+            LEFT JOIN comment_tbl t2 on t1.new_id=t2.id and t1.mode=0
+            LEFT JOIN likes_tb t3 on t1.new_id=t3.id and t1.mode=1
+          	WHERE t1.status=0
+          )t1
+       LEFT JOIN post_tb t2 on t1.PostID=t2.id
+       LEFT JOIN user_tbl t3 on t1.user_id=t3.id
